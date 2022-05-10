@@ -1,5 +1,7 @@
 # Taxon
 
+Code for the blog post [Classifying Data Center IP Addresses in Phoenix Web Applications with Radix Trees](https://paraxial.io/blog/cloud-ips).
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
