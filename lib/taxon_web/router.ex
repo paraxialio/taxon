@@ -8,7 +8,8 @@ defmodule TaxonWeb.Router do
     plug :put_root_layout, {TaxonWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug Taxon.DataCenterPlug # Add this line
+    # Add this line
+    plug Taxon.DataCenterPlug
   end
 
   pipeline :api do

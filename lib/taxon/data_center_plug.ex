@@ -4,8 +4,10 @@ defmodule Taxon.DataCenterPlug do
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    aws_ip = {3, 5, 140, 2} # Add this line, AWS IP
-    conn = Map.put(conn, :remote_ip, aws_ip) # Add this line
+    # Add this line, AWS IP
+    aws_ip = {3, 5, 140, 2}
+    # Add this line
+    conn = Map.put(conn, :remote_ip, aws_ip)
     iptrie = :persistent_term.get({Taxon.Fetcher, :dc_trie})
     lookup = Iptrie.lookup(iptrie, conn.remote_ip)
 

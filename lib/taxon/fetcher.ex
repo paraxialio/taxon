@@ -2,9 +2,7 @@ defmodule Taxon.Fetcher do
   def add_cloud_ips() do
     providers = %{
       aws: "https://ip-ranges.amazonaws.com/ip-ranges.json",
-      azure:
-        "https://download.microsoft.com/download/7/1/D/" <>
-          "71D86715-5596-4529-9B13-DA13A5DE5B63/ServiceTags_Public_20220425.json"
+      azure: "https://www.microsoft.com/en-us/download/confirmation.aspx?id=56519"
     }
 
     get_prefixes_update_term(providers)
@@ -55,12 +53,32 @@ defmodule Taxon.Fetcher do
 
   def url_to_prefixes(url, :azure) do
     with {:ok, %{status_code: 200, body: body}} <- HTTPoison.get(url),
-         {:ok, j_body} <- Jason.decode(body) do
-      extract_prefixes_azure(j_body)
+         {:ok, json_url} <- get_json_url(body),
+         {:ok, %{status_code: 200, body: json_body}} <-
+           HTTPoison.get(json_url, [], follow_redirect: true),
+         {:ok, jd_body} <- Jason.decode(json_body) do
+      extract_prefixes_azure(jd_body)
     else
       _ ->
         []
     end
+  end
+
+  def get_json_url(body) do
+    {:ok, html} = Floki.parse_document(body)
+
+    json_url =
+      html
+      |> Floki.find("a, href")
+      |> Enum.map(fn {_a, l, _} ->
+        Enum.filter(l, fn {_k, v} -> String.contains?(v, ".json") end)
+      end)
+      |> Enum.filter(fn x -> x != [] end)
+      |> hd()
+      |> hd()
+      |> elem(1)
+
+    {:ok, json_url}
   end
 
   def extract_prefixes_aws(body, k1, k2) do
